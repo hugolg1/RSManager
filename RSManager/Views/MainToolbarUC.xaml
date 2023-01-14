@@ -1,0 +1,232 @@
+﻿<UserControl x:Class="RSManager.Views.MainToolbarUC"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RSManager.Views"
+             xmlns:conv="clr-namespace:RSManager.Converters"
+             xmlns:behv="clr-namespace:RSManager.Base.Behaviours"
+             mc:Ignorable="d" 
+             d:DesignHeight="50" d:DesignWidth="800">
+    <Grid UseLayoutRounding="True" SnapsToDevicePixels="True">
+        <Grid.Resources>
+            <conv:UnitSizeValueConverter x:Key="unitSizeValueConverter"/>
+            <conv:BooleanToVisibilityValueConverter x:Key="booleanToVisibilityValueConverter"/>
+        </Grid.Resources>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0" Padding="4" Margin="2 4 2 4">
+            <StackPanel Orientation="Horizontal">
+                <Button ToolTip="Back" Command="{Binding NavigateToBackCmd}" Style="{StaticResource BtnToolbarStyle}" Width="26" Height="26">
+                    <Image Source="/Resources/Images/arrowLeft_48.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Button>
+                <Button ToolTip="Next" Command="{Binding NavigateToAheadCmd}" Style="{StaticResource BtnToolbarStyle}" Width="26" Height="26" Margin="2 0 0 0">
+                    <Image Source="/Resources/Images/arrowRight_48.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Button>
+                <Button ToolTip="Refresh" Command="{Binding RefreshCmd}" Style="{StaticResource BtnToolbarStyle}"  Width="26" Height="26" Margin="2 0 0 0">
+                    <Image Source="/Resources/Images/refresh_48.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Button>
+                <Button ToolTip="Home" Command="{Binding NavigateToHomeCmd}" Style="{StaticResource BtnToolbarStyle}"  Width="26" Height="26" Margin="2 0 0 0">
+                    <Image Source="/Resources/Images/home_48.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Button>
+            </StackPanel>
+        </Border>
+        <Border Grid.Column="1" BorderBrush="{StaticResource BorderBrush}" Background="{StaticResource PrimaryLightBrush}" Height="30" BorderThickness="1" Padding="4" Margin="2" CornerRadius="4"
+                ToolTip="{Binding ExplorerPath}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding ExplorerPath}" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+        <Border Grid.Column="2" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0" Padding="4" Margin="2 4 2 4">
+            <StackPanel Orientation="Horizontal">
+                <Button ToolTip="Account" Command="{Binding SettingsCmd}" Style="{StaticResource BtnToolbarStyle}" Width="26" Height="26">
+                    <Image Source="/Resources/Images/login_48.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Button>
+                <Grid Margin="2 0 0 0">
+                    <Button x:Name="btnStatusDownloads" ToolTip="Downloads"
+                            Command="{Binding ShowHideDownloadsCmd}" 
+                            Style="{StaticResource BtnToolbarStyle}" Width="26" Height="26">
+                        <Image Source="/Resources/Images/markDown_48.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+                    </Button>
+                    <Ellipse Width="8" Height="8" Margin="0 0 3 1.5" IsHitTestVisible="False"
+                             VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                             Visibility="{Binding ItemTransferVM.HasTransfers,Converter={StaticResource booleanToVisibilityValueConverter}, UpdateSourceTrigger=PropertyChanged}">
+                        <Ellipse.Fill>
+                            <RadialGradientBrush>
+                                <GradientStop Color="{StaticResource PrimaryLight}" Offset="0"/>
+                                <GradientStop Color="#FF14C4FF" Offset="1"/>
+                            </RadialGradientBrush>
+                        </Ellipse.Fill>
+                    </Ellipse>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <Popup PlacementTarget="{Binding ElementName=btnStatusDownloads}"
+                   Placement="Left" StaysOpen="False"
+                   HorizontalOffset="29" VerticalOffset="28"
+                   IsOpen="{Binding IsDownloadsPopupVisible,Mode=TwoWay}">
+            <Border Visibility="{Binding ItemTransferVM.HasTransfers,Converter={StaticResource booleanToVisibilityValueConverter}, UpdateSourceTrigger=PropertyChanged}">
+                <StackPanel Orientation="Vertical">
+                    <ListBox MinHeight="72" Width="300" ItemsSource="{Binding ItemTransferVM.Transfers,UpdateSourceTrigger=PropertyChanged}"
+                             MaxHeight="300">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderThickness="0 0 0 1" BorderBrush="Gray" Width="296" Margin="-2">
+                                    <Grid Margin="8 8 8 8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="50"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="0" Padding="0" VerticalAlignment="Top">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Status}" Value="2">
+                                                            <Setter Property="Text" Value="Downloading..."/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="3">
+                                                            <Setter Property="Text" Value="Cancelled"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="5">
+                                                            <Setter Property="Text" Value="Error"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="4">
+                                                            <Setter Property="Text">
+                                                                <Setter.Value>
+                                                                    <MultiBinding StringFormat="{}{0} - {1}">
+                                                                        <Binding Path="Null" FallbackValue="Completed"/>
+                                                                        <Binding Path="PackageSize" Converter="{StaticResource unitSizeValueConverter}"/>
+                                                                    </MultiBinding>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"
+                                                   HorizontalAlignment="Right"
+                                                   Text="{Binding CreatedDate,StringFormat=g}"
+                                                   FontSize="11" Foreground="Gray"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                                   Foreground="Gray" Margin="0 2 0 0"
+                                                   Text="{Binding DestinationPath}"/>
+
+                                        <ProgressBar Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Height="10" Margin="0 6 0 2"
+                                                     Background="{StaticResource AccentBrush}"
+                                                     Foreground="{StaticResource PrimaryBrush}"
+                                                     Minimum="0" Maximum="100"
+                                                     Value="{Binding TransferPercent,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}"/>
+
+                                        <Button Grid.Row="0" Grid.RowSpan="3" Grid.Column="4">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource BtnIconStyle}">
+                                                    <Setter Property="behv:ButtonBehaviour.IconPath" Value="{x:Null}"/>
+                                                    <Setter Property="Width" Value="22"/>
+                                                    <Setter Property="Height" Value="22"/>
+                                                    <Style.Triggers>                                                        
+                                                        <!--Downloading-->
+                                                        <DataTrigger Binding="{Binding Status}" Value="2">
+                                                            <Setter Property="behv:ButtonBehaviour.IconPath" Value="{StaticResource ClosePath}"/>
+                                                            <Setter Property="ToolTip" Value="Cancel"/>
+                                                            <Setter Property="Width" Value="22"/>
+                                                            <Setter Property="Height" Value="22"/>
+                                                            <Setter Property="Command" Value="{Binding PlacementTarget.DataContext.ItemTransferVM.CancelTransferCmd,RelativeSource={RelativeSource AncestorType={x:Type Popup}}}"/>
+                                                            <Setter Property="CommandParameter" Value="{Binding}"/>
+                                                        </DataTrigger>
+                                                        <!--Cancelled-->
+                                                        <DataTrigger Binding="{Binding Status}" Value="3">
+                                                            <Setter Property="behv:ButtonBehaviour.IconPath" Value="{StaticResource FolderPath}"/>
+                                                            <Setter Property="ToolTip" Value="Show in Folder"/>
+                                                            <Setter Property="Width" Value="24"/>
+                                                            <Setter Property="Height" Value="24"/>
+                                                            <Setter Property="Command" Value="{Binding PlacementTarget.DataContext.ItemTransferVM.OpenTransferFolderCmd,RelativeSource={RelativeSource AncestorType={x:Type Popup}}}"/>
+                                                            <Setter Property="CommandParameter" Value="{Binding}"/>
+                                                        </DataTrigger>
+                                                        <!--Completed-->
+                                                        <DataTrigger Binding="{Binding Status}" Value="4">
+                                                            <Setter Property="behv:ButtonBehaviour.IconPath" Value="{StaticResource FolderPath}"/>
+                                                            <Setter Property="ToolTip" Value="Show in Folder"/>
+                                                            <Setter Property="Width" Value="24"/>
+                                                            <Setter Property="Height" Value="24"/>
+                                                            <Setter Property="Command" Value="{Binding PlacementTarget.DataContext.ItemTransferVM.OpenTransferFolderCmd,RelativeSource={RelativeSource AncestorType={x:Type Popup}}}"/>
+                                                            <Setter Property="CommandParameter" Value="{Binding}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="0"/>
+                                <!--<Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="BorderBrush" Value="Gray"/>-->
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border
+                                                BorderThickness="{TemplateBinding Border.BorderThickness}"
+                                                Padding="{TemplateBinding Control.Padding}"
+                                                BorderBrush="{TemplateBinding Border.BorderBrush}"
+                                                Background="{TemplateBinding Panel.Background}"
+                                                SnapsToDevicePixels="True">
+                                                <ContentPresenter
+                                                    Content="{TemplateBinding ContentControl.Content}"
+                                                    ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}"
+                                                    HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}"
+                                                    VerticalAlignment="{TemplateBinding Control.VerticalContentAlignment}"
+                                                    SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True" >
+                                        <Setter Property="FontWeight" Value="Bold" />
+                                        <Setter Property="BorderBrush" Value="{StaticResource SecundaryBrush}"/>
+                                        <Setter Property="BorderThickness" Value="2"/>
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True" >
+                                        <Setter Property="Background" Value="{StaticResource PrimaryLightBrush}"/>
+                                        <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                    <Border Background="White" BorderBrush="Gray" BorderThickness="1 0.5 1 1">
+                        <Button Margin="2" HorizontalAlignment="Left" 
+                                ToolTip="Clean Downloads"
+                                Command="{Binding ItemTransferVM.CleanTransfersCmd}"
+                                Style="{StaticResource BtnToolbarStyle}" Width="24" Height="24">
+                            <Image Source="/Resources/Images/trash_48.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+                        </Button>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </Popup>
+    </Grid>
+</UserControl>
