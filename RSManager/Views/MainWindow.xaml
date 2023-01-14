@@ -1,0 +1,128 @@
+﻿<Window x:Class="RSManager.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RSManager"
+        xmlns:conv="clr-namespace:RSManager.Converters"
+        xmlns:views="clr-namespace:RSManager.Views"
+        xmlns:ctrl="clr-namespace:RSManager.Base.Controls" 
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        Loaded="Window_Loaded"
+        MouseDown="Window_MouseDown"
+        Title="RS Manager" Height="450" Width="800" MinHeight="300" MinWidth="300"
+        UseLayoutRounding="True">
+    <Grid>
+        <Grid.Resources>
+            <conv:UnitSizeValueConverter x:Key="unitSizeValueConverter"/>
+            <conv:BooleanToVisibilityValueConverter x:Key="booleanToVisibilityValueConverter"/>
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <views:MainToolbarUC Grid.Row="0"/>
+
+        <ctrl:DataGridBase Grid.Row="1" x:Name="gridItems" Margin="4 0" BorderThickness="0 1 0 1" BorderBrush="{StaticResource BorderBrush}"
+                  ItemsSource="{Binding ItemsPath, UpdateSourceTrigger=PropertyChanged}"
+                  AutoGenerateColumns="False" GridLinesVisibility="None" IsReadOnly="True"
+                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserSortColumns="True"
+                  SelectionMode="Extended" Background="White">
+            <DataGrid.Resources>
+                <Style x:Key="ElementTextColumnStyle" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                </Style>
+            </DataGrid.Resources>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="Name" SortMemberPath="Name" Width="200">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Width="24" Height="24">
+                                    <Image.Style>
+                                        <Style TargetType="Image">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Path=IsFolder}" Value="True">
+                                                    <Setter Property="Source" Value="/Resources/Images/folder_24.png"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Path=IsFolder}" Value="False">
+                                                    <Setter Property="Source" Value="/Resources/Images/file_24.png"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
+                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Created Date" Binding="{Binding CreatedDate,StringFormat=g}" Width="120" Visibility="Collapsed"
+                                    ElementStyle="{StaticResource ElementTextColumnStyle}"/>
+                <DataGridTextColumn Header="Created By" Binding="{Binding CreatedBy,StringFormat=g}" Width="120" Visibility="Collapsed"
+                                    ElementStyle="{StaticResource ElementTextColumnStyle}"/>
+                <DataGridTextColumn Header="Modified Date" Binding="{Binding ModifiedDate,StringFormat=g}" Width="120"
+                                    ElementStyle="{StaticResource ElementTextColumnStyle}"/>
+                <DataGridTextColumn Header="Modified By" Binding="{Binding ModifiedBy,StringFormat=g}" Width="120"
+                                    ElementStyle="{StaticResource ElementTextColumnStyle}"/>
+                <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="80" 
+                                    ElementStyle="{StaticResource ElementTextColumnStyle}"/>                
+                <DataGridTemplateColumn Header="Size" SortMemberPath="Size" Width="80">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock VerticalAlignment="Center" Margin="2">
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                        <Setter Property="Text" Value="{Binding Size,Converter={StaticResource unitSizeValueConverter}}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Size,Converter={StaticResource unitSizeValueConverter}}" Value="{x:Null}">
+                                                <Setter Property="Text" Value=""/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseDoubleClick">
+                    <i:InvokeCommandAction Command="{Binding NavigateToCmd}"
+                                           CommandParameter="{Binding ElementName=gridItems,Path=SelectedItem}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ctrl:DataGridBase>
+
+        <Border Grid.Row="2" Padding="4">
+
+            <DockPanel>
+                <Button DockPanel.Dock="Right" x:Name="btnDownload" Content="Download"
+                        Command="{Binding DownloadCmd}"
+                        CommandParameter="{Binding ElementName=gridItems,Path=SelectedDataItems}"/>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                <Setter Property="Text" Value="{Binding ElementName=gridItems,Path=Items.Count,StringFormat={}{0} Items}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=gridItems,Path=Items.Count}" Value="1">
+                                        <Setter Property="Text" Value="1 Item"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+    </Grid>
+</Window>

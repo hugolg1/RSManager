@@ -1,0 +1,67 @@
+﻿<Window x:Class="RSManager.Views.ConnectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RSManager.Views"
+        xmlns:behv="clr-namespace:RSManager.Base.Behaviours"
+        mc:Ignorable="d"
+        xmlns:conv="clr-namespace:RSManager.Converters"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="WidthAndHeight"
+        ResizeMode="NoResize"
+        WindowStyle="ThreeDBorderWindow"
+        Title="RS Manager">
+    <Window.Resources>
+        <conv:TextMaskValueConverter x:Key="textMaskValueConverter"/>
+    </Window.Resources>
+    <Grid Margin="10 5 10 15" MinWidth="300">
+
+        <Grid.Resources>
+            <Style TargetType="TextBox" BasedOn="{StaticResource TitleTextBoxStyle}"/>
+        </Grid.Resources>
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="0"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="0"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="0"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" 
+                 behv:TextBoxBehaviour.Title="Api" Text="{Binding Uri,UpdateSourceTrigger=PropertyChanged}"/>
+        
+        <TextBox Grid.Row="2" Grid.Column="0"
+                 behv:TextBoxBehaviour.Title="User" Text="{Binding User,UpdateSourceTrigger=PropertyChanged}"/>
+
+        <TextBox Grid.Row="2" Grid.Column="1"
+                 behv:TextBoxBehaviour.Title="Domain" Text="{Binding Domain,UpdateSourceTrigger=PropertyChanged}"/>
+        
+        <TextBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" 
+                 behv:TextBoxBehaviour.Title="Password"
+                 Text="{Binding Password,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource textMaskValueConverter},ConverterParameter=*}"/>
+
+        <CheckBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding RememberPassword,UpdateSourceTrigger=PropertyChanged}" 
+                  IsThreeState="False"
+                  Content="Remember password"/>
+
+        <!--<Button Grid.Row="6" Grid.Column="1"
+                Style="{StaticResource BtnIconStyle}" Width="24" Height="24"
+                behv:ButtonBehaviour.IconPath="{StaticResource FolderPath}"/>-->
+
+        <StackPanel Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content="Cancel" Command="{Binding CancelCmd}" Margin="0 0 2 0"/>
+            <Button Content="Connect" IsDefault="True" Command="{Binding ConnectCmd}" Margin="2 0 0 0"/>
+        </StackPanel>
+
+    </Grid>
+</Window>
