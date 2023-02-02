@@ -28,9 +28,14 @@ namespace RSManager.Converters
         {
             if (value is string text)
             {
-                if(originalText == null)
+                if (originalText == null)
                 {
                     return value;
+                }
+               
+                if (text.Length == 1 && text != parameter?.ToString())
+                {
+                    return text;
                 }
 
                 if (text.Length > originalText.Length)

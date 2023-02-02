@@ -58,8 +58,13 @@ namespace RSManager.Test.UnitTest
         {
             TextMaskValueConverter converter = new TextMaskValueConverter();
 
-            Assert.AreEqual("***", converter.Convert("123", null, "*", culture));
-            Assert.AreEqual("??", converter.Convert("AA", null, "?", culture));
+            string pass = "123";
+
+            Assert.AreEqual("***", converter.Convert(pass, null, "*", culture));
+            Assert.AreEqual("123", converter.ConvertBack("***", null, null, culture));
+
+            pass = "A";
+            Assert.AreEqual("?", converter.Convert(pass, null, "?", culture));
         }
 
         [TestMethod]
